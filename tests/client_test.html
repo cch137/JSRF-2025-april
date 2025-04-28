@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JSRF Client Test</title>
+    <script src="../src/client.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cbor-js@0.1.0/cbor.min.js"></script>
+    <script>
+      // Polyfill for Buffer in browser environment for testing
+      // This is a simplified version to support basic Buffer operations
+      window.Buffer = {
+        from: function (data) {
+          if (typeof data === "string") {
+            const arr = new Uint8Array(data.length);
+            for (let i = 0; i < data.length; i++) {
+              arr[i] = data.charCodeAt(i);
+            }
+            return arr;
+          }
+          return new Uint8Array(data);
+        },
+        alloc: function (size) {
+          return new Uint8Array(size);
+        },
+      };
+      // Ensure CBOR is available globally
+      window.CBOR = window.CBOR || {};
+    </script>
+  </head>
+  <body>
+    <script>
+      async function runTests() {
+        console.log("Starting JSRF Client Tests in Browser");
+        const client = new JSRFClient("ws://localhost:8081");
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait for connection
+        console.log("Client initialized:", client);
+
+        // Register a service for testing
+        const channelId = await client.registerService("test-service", 1); // ServiceType.JSON_SYNCHRONIZATION
+        console.log("Service registered with channel ID:", channelId);
+      }
+      window.onload = runTests;
+    </script>
+  </body>
+</html>

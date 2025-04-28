@@ -49,4 +49,27 @@ describe("Packet", () => {
     expect(decoded.headers).toEqual(headers);
     expect(decoded.payload).toBeNull();
   });
+
+  test("should encode and decode a packet with complex nested payload", () => {
+    const headers: PacketHeaders = {
+      hasAck: true,
+      opcode: Opcode.OPEN_CHANNEL,
+      channel: 3,
+      seq: 400,
+      ack: 50,
+    };
+    const payload = {
+      level1: {
+        a: 1,
+        b: [true, false],
+        c: { d: "text", e: [{ f: 2 }] },
+      },
+    };
+    const packet = new Packet(headers, payload);
+    const encoded = Packet.encode(packet);
+    const decoded = Packet.decode(encoded);
+
+    expect(decoded.headers).toEqual(headers);
+    expect(decoded.payload).toEqual(payload);
+  });
 });

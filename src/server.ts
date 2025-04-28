@@ -120,4 +120,8 @@ export class JSRFServer {
       service.handler = handler;
     }
   }
+
+  public close(): void {
+    this.wss.close();
+  }
 }

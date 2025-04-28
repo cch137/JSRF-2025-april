@@ -1,9 +1,48 @@
-import WebSocket from "ws";
+interface WebSocketInterface {
+  send(data: any): void;
+  addEventListener(event: string, callback: (data: any) => void): void;
+  readyState: number;
+  close(): void;
+}
+
+declare const WebSocket: {
+  new (url: string): WebSocketInterface;
+  CONNECTING: 0;
+  OPEN: 1;
+  CLOSING: 2;
+  CLOSED: 3;
+};
+
+// Polyfill Buffer if not available in browser environment
+declare const Buffer: any;
+declare const globalThis: any;
+
+if (
+  typeof Buffer === "undefined" &&
+  typeof globalThis !== "undefined" &&
+  "window" in globalThis
+) {
+  (globalThis as any).Buffer = {
+    from: function (data: any) {
+      if (typeof data === "string") {
+        const arr = new Uint8Array(data.length);
+        for (let i = 0; i < data.length; i++) {
+          arr[i] = data.charCodeAt(i);
+        }
+        return arr;
+      }
+      return new Uint8Array(data);
+    },
+    alloc: function (size: number) {
+      return new Uint8Array(size);
+    },
+  };
+}
 import { Packet, PacketHeaders } from "./packet";
 import { ServiceType, Opcode } from "./types";
 
 export class JSRFClient {
-  private ws: WebSocket;
+  private ws: WebSocketInterface;
   private services: Map<
     number,
     {
@@ -23,19 +62,26 @@ export class JSRFClient {
   }
 
   private setupClient(): void {
-    this.ws.on("open", () => {
+    this.ws.addEventListener("open", () => {
       console.log("Connected to JSRF server");
     });
-    this.ws.on("message", async (data: WebSocket.Data) => {
+    this.ws.addEventListener("message", async (data: any) => {
       await this.handleMessage(data);
     });
-    this.ws.on("close", () => {
+    this.ws.addEventListener("close", () => {
       console.log("Disconnected from JSRF server");
     });
   }
 
-  private async handleMessage(data: WebSocket.Data): Promise<void> {
-    const buffer = Buffer.from(data as ArrayBuffer);
+  private async handleMessage(data: any): Promise<void> {
+    let bufferData = data;
+    if (data instanceof MessageEvent) {
+      bufferData = data.data;
+    }
+    if (bufferData instanceof Blob) {
+      bufferData = await bufferData.arrayBuffer();
+    }
+    const buffer = Buffer.from(bufferData as ArrayBuffer);
     const packet = Packet.decode(buffer);
     this.lastAck = packet.headers.seq;
 
