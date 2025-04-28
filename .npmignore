@@ -1,0 +1,61 @@
+# Ignore source files if you are only publishing compiled output
+src/
+*.ts
+*.tsx
+
+# Ignore build directories if you are publishing compiled output
+dist/
+build/
+
+# Ignore test files
+test/
+tests/
+__tests__/
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+
+# Ignore configuration files
+.babelrc
+.eslintrc
+.eslintrc.js
+.eslintrc.json
+.prettierrc
+.prettierrc.js
+.prettierrc.json
+.jestrc
+.jestrc.js
+.jestrc.json
+.tsconfig.json
+
+# Ignore editor and OS files
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+*.swn
+
+# Ignore coverage reports
+coverage/
+
+# Ignore documentation unless you want to include it
+docs/
+examples/
+
+# Ignore git files
+.git
+.gitignore
+.gitattributes
+
+# Ignore npm and yarn files
+.npmrc
+.yarnrc
+.yarn-integrity
+.pnp.*
+
+# Ignore miscellaneous
+*.log
+*.md
+LICENSE
