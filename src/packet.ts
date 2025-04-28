@@ -33,9 +33,10 @@ export class Packet {
     // Write seq (4 bytes)
     buffer.writeUInt32BE(headers.seq, offset);
     offset += 4;
-    // Write ack if present (4 bytes)
-    if (headers.hasAck && headers.ack !== undefined) {
-      buffer.writeUInt32BE(headers.ack, offset);
+    // Write ack if hasAck is true, use 0 if undefined (4 bytes)
+    if (headers.hasAck) {
+      buffer.writeUInt32BE(headers.ack !== undefined ? headers.ack : 0, offset);
+      offset += 4;
     }
 
     const cbor = require("cbor");
@@ -55,8 +56,12 @@ export class Packet {
     offset += 4;
     let ack: number | undefined;
     if (hasAck) {
-      ack = buffer.readUInt32BE(offset);
-      offset += 4;
+      if (offset + 4 <= buffer.length) {
+        ack = buffer.readUInt32BE(offset);
+        offset += 4;
+      } else {
+        ack = undefined; // Ensure ack remains undefined if buffer is too short
+      }
     }
 
     const payloadBuffer = buffer.slice(offset);
