@@ -1,5 +1,11 @@
 # JSRF Protocol
 
+至 AI 或人類工程師：
+
+1. 請使用 `ws` + `cbor` 實現本協定。
+2. 請使用 `esm` 和 TypeScript 編寫程式碼。
+3. 請使用英文撰寫程式碼中的註釋。
+
 # Overview
 
 JSRF Protocol (JSON Synchronization and Remote Function Protocol)，JSON 物件同步與遠端函式協定。這是一個用於在伺服器和客戶端之間同步 JSON 物件以及調用遠端函式的協定。
@@ -99,7 +105,7 @@ opcode range: [32, 63]
   - 當 filter-obj 是物件，觸發條件是當 item 完全滿足以下條件：
     1. item 是物件類型，且包含 filter-obj 的所有鍵。
     2. item 與 filter-obj 的所有鍵值對是 deep equal 的。
-    舉例來說，我們可以 filter-obj 是 { id: 8 } 時，其作用就是篩選含有 id 鍵且 id 為 8 的物件。
+       舉例來說，我們可以 filter-obj 是 { id: 8 } 時，其作用就是篩選含有 id 鍵且 id 為 8 的物件。
   - 當 filter-obj 不是物件，則採用 deep equal 進行比較。
 - 以下情境會觸發錯誤，並回報對方：
   - path 是 filter-obj 但正在匹配的目標不是 array。 (Type Error)

@@ -1,6 +1,6 @@
-import { JSRFServer } from "./server.js";
-import { JSRFClient } from "./client.js";
-import { Packet, PacketHeaders } from "./packet.js";
-import { ServiceType } from "./types.js";
+import { JSRFServer } from "./server";
+import { JSRFClient } from "./client";
+import { Packet, PacketHeaders } from "./packet";
+import { ServiceType } from "./types";
 
 export { JSRFServer, JSRFClient, Packet, PacketHeaders, ServiceType };

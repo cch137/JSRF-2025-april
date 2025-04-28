@@ -17,10 +17,7 @@ export class Packet {
     this.payload = payload;
   }
 
-  static encode(
-    packet: Packet,
-    format: "json" | "cbor" | "msgpack" | "shuttle" = "json"
-  ): Buffer {
+  static encode(packet: Packet): Buffer {
     const headers = packet.headers;
     const buffer = Buffer.alloc(7 + (headers.hasAck ? 4 : 0));
     let offset = 0;
@@ -41,31 +38,13 @@ export class Packet {
       buffer.writeUInt32BE(headers.ack, offset);
     }
 
-    let payloadBuffer: Buffer;
-    switch (format) {
-      case "cbor":
-        const cbor = require("cbor");
-        payloadBuffer = cbor.encode(packet.payload);
-        break;
-      case "msgpack":
-        const msgpack = require("@msgpack/msgpack");
-        payloadBuffer = msgpack.encode(packet.payload);
-        break;
-      case "shuttle":
-        // Placeholder for shuttle encoding
-        payloadBuffer = Buffer.from(JSON.stringify(packet.payload));
-        break;
-      default:
-        payloadBuffer = Buffer.from(JSON.stringify(packet.payload));
-    }
+    const cbor = require("cbor");
+    const payloadBuffer = cbor.encode(packet.payload);
 
     return Buffer.concat([buffer, payloadBuffer]);
   }
 
-  static decode(
-    buffer: Buffer,
-    format: "json" | "cbor" | "msgpack" | "shuttle" = "json"
-  ): Packet {
+  static decode(buffer: Buffer): Packet {
     let offset = 0;
     const firstByte = buffer.readUInt8(offset++);
     const hasAck = firstByte >> 7 === 1;
@@ -81,23 +60,8 @@ export class Packet {
     }
 
     const payloadBuffer = buffer.slice(offset);
-    let payload: any;
-    switch (format) {
-      case "cbor":
-        const cbor = require("cbor");
-        payload = cbor.decode(payloadBuffer);
-        break;
-      case "msgpack":
-        const msgpack = require("@msgpack/msgpack");
-        payload = msgpack.decode(payloadBuffer);
-        break;
-      case "shuttle":
-        // Placeholder for shuttle decoding
-        payload = JSON.parse(payloadBuffer.toString());
-        break;
-      default:
-        payload = JSON.parse(payloadBuffer.toString());
-    }
+    const cbor = require("cbor");
+    const payload = cbor.decode(payloadBuffer);
 
     return new Packet(
       {
